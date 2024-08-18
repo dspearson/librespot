@@ -129,6 +129,7 @@ impl Builder {
     /// # Errors
     /// If setting up the mdns service or creating the server fails, this function returns an error.
     pub fn launch(self) -> Result<Discovery, Error> {
+        println!("Starting discovery server");
         let mut port = self.port;
         let name = self.server_config.name.clone().into_owned();
         let server = DiscoveryServer::new(self.server_config, &mut port)?;
@@ -137,6 +138,7 @@ impl Builder {
 
         #[cfg(feature = "with-dns-sd")]
         {
+            println!("Starting dns-sd service");
             svc = dns_sd::DNSService::register(
                 Some(name.as_ref()),
                 "_spotify-connect._tcp",
@@ -150,13 +152,16 @@ impl Builder {
         #[cfg(not(feature = "with-dns-sd"))]
         {
             let _svc = if !_zeroconf_ip.is_empty() {
+                println!("Starting mdns service with ip list");
                 libmdns::Responder::spawn_with_ip_list(
                     &tokio::runtime::Handle::current(),
                     _zeroconf_ip,
                 )?
             } else {
+                println!("Starting mdns service");
                 libmdns::Responder::spawn(&tokio::runtime::Handle::current())?
             };
+            println!("Registering service");
             svc = _svc.register(
                 "_spotify-connect._tcp".to_owned(),
                 name,
