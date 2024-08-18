@@ -251,7 +251,7 @@ pub struct DiscoveryServer {
 impl DiscoveryServer {
     pub fn new(config: Config, port: &mut u16) -> Result<Self, Error> {
         let (discovery, cred_rx) = RequestHandler::new(config);
-        let address = SocketAddr::new(Ipv4Addr::UNSPECIFIED.into(), *port);
+        let address = SocketAddr::new(Ipv4Addr::new(127, 0, 0, 1).into(), *port);
 
         let (close_tx, close_rx) = oneshot::channel();
 
@@ -269,7 +269,7 @@ impl DiscoveryServer {
         match listener.local_addr() {
             Ok(addr) => {
                 *port = addr.port();
-                debug!("Zeroconf server listening on 0.0.0.0:{}", *port);
+                debug!("Zeroconf server listening on 127.0.0.1:{}", *port);
             }
             Err(e) => {
                 warn!("Discovery server failed to start: {e}");
