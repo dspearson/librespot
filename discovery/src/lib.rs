@@ -153,7 +153,7 @@ impl Builder {
         {
             let _svc = if !_zeroconf_ip.is_empty() {
                 println!("Starting mdns service with ip list");
-                libmdns::Responder::new_with_ip_list(_zeroconf_ip.clone())?
+                libmdns::Responder::spawn_with_ip_list(&tokio::runtime::Handle::current(), _zeroconf_ip.clone())?
             } else {
                 libmdns::Responder::spawn(&tokio::runtime::Handle::current())?
             };
